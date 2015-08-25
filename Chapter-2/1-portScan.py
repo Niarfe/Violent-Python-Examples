@@ -7,59 +7,54 @@ from threading import *
 
 screenLock = Semaphore(value=1)
 
-def connScan(tgtHost, tgtPort):
+
+def connScan(targetHost, targetPort):
     try:
-        connSkt = socket(AF_INET, SOCK_STREAM)
-        connSkt.connect((tgtHost, tgtPort))
-        connSkt.send('ViolentPython\r\n')
-        results = connSkt.recv(100)
+        connSocket = socket(AF_INET, SOCK_STREAM)
+        connSocket.connect((targetHost, targetPort))
+        connSocket.send('ViolentPython\r\n')
+        results = connSocket.recv(100)
         screenLock.acquire()
-        print '[+] %d/tcp open' % tgtPort
+        print '[+] %d/tcp open' % targetPort
         print '[+] ' + str(results)
     except:
         screenLock.acquire()
-        print '[-] %d/tcp closed' % tgtPort
+        print '[-] %d/tcp closed' % targetPort
     finally:
-	screenLock.release()
-	connSkt.close()	
+        screenLock.release()
+        connSocket.close()
 
-def portScan(tgtHost, tgtPorts):
+
+def portScan(targetHost, targetPorts):
     try:
-        tgtIP = gethostbyname(tgtHost)
+        targetIP = gethostbyname(targetHost)
     except:
-        print "[-] Cannot resolve '%s': Unknown host" %tgtHost
+        print "[-] Cannot resolve '%s': Unknown host" % targetHost
         return
 
     try:
-        tgtName = gethostbyaddr(tgtIP)
-        print '\n[+] Scan Results for: ' + tgtName[0]
+        targetName = gethostbyaddr(targetIP)
+        print '\n[+] Scan Results for: ' + targetName[0]
     except:
-        print '\n[+] Scan Results for: ' + tgtIP
+        print '\n[+] Scan Results for: ' + targetIP
 
     setdefaulttimeout(1)
-    for tgtPort in tgtPorts:
-        t = Thread(target=connScan,args=(tgtHost,int(tgtPort)))
+    for targetPort in targetPorts:
+        t = Thread(target=connScan, args=(targetHost, int(targetPort)))
         t.start()
 
-def main():
-    parser = optparse.OptionParser('usage %prog '+\
-      '-H <target host> -p <target port>')
-    parser.add_option('-H', dest='tgtHost', type='string',\
-      help='specify target host')
-    parser.add_option('-p', dest='tgtPort', type='string',\
-      help='specify target port[s] separated by comma')
+if __name__ == '__main__':
+    parser = optparse.OptionParser('usage: %prog -H  <target host> -p <target port>')
+    parser.add_option('-H', dest='targetHost', type='string', help='specify target host')
+    parser.add_option('-p', dest='targetPort', type='string', help='specify target port[s] separated by comma')
 
     (options, args) = parser.parse_args()
 
-    tgtHost = options.tgtHost
-    tgtPorts = str(options.tgtPort).split(',')
+    targetHost = options.targetHost
+    targetPorts = str(options.targetPort).split(',')
 
-    if (tgtHost == None) | (tgtPorts[0] == None):
-	print parser.usage
+    if (targetHost is None) | (targetPorts[0] is None):
+        parser.print_help()
         exit(0)
 
-    portScan(tgtHost, tgtPorts)
-
-
-if __name__ == '__main__':
-    main()
+    portScan(targetHost, targetPorts)
