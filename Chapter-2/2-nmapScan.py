@@ -1,32 +1,28 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 import nmap
 import optparse
 
-def nmapScan(tgtHost,tgtPort):
+
+def nmapScan(targetHost, targetPort):
     nmScan = nmap.PortScanner()
-    nmScan.scan(tgtHost,tgtPort)
-    state=nmScan[tgtHost]['tcp'][int(tgtPort)]['state']
-    print "[*] " + tgtHost + " tcp/"+tgtPort +" "+state
-
-def main():
-    parser = optparse.OptionParser('usage %prog '+\
-                                   '-H <target host> -p <target port>')
-    parser.add_option('-H', dest='tgtHost', type='string',\
-                      help='specify target host')
-    parser.add_option('-p', dest='tgtPort', type='string',\
-                      help='specify target port[s] separated by comma')
-    
-    (options, args) = parser.parse_args()
-    
-    tgtHost = options.tgtHost
-    tgtPorts = str(options.tgtPort).split(',')
-    
-    if (tgtHost == None) | (tgtPorts[0] == None):
-        print parser.usage
-        exit(0)
-    for tgtPort in tgtPorts:
-        nmapScan(tgtHost, tgtPort)
-
+    nmScan.scan(targetHost, targetPort)
+    state = nmScan[targetHost]['tcp'][int(targetPort)]['state']
+    print "[*] " + targetHost + " tcp/" + targetPort + " " + state
 
 if __name__ == '__main__':
-    main()
+    parser = optparse.OptionParser('usage %prog -H <target host> -p <target port>')
+    parser.add_option('-H', dest='targetHost', type='string', help='specify target host')
+    parser.add_option('-p', dest='targetPort', type='string', help='specify target port[s] separated by comma')
 
+    (options, args) = parser.parse_args()
+
+    targetHost = options.targetHost
+    targetPorts = str(options.targetPort).split(',')
+
+    if (targetHost is None) | (targetPorts[0] is None):
+        parser.print_help()
+        exit(0)
+    for targetPort in targetPorts:
+        nmapScan(targetHost, targetPort)
